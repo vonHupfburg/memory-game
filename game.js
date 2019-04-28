@@ -24,21 +24,24 @@ class Grid {
   constructor(numRows, numCols) {
     this.numRows = numRows;
     this.numCols = numCols;
-    this.tileArray = this.createTileMatrix();
+    this.tileMatrix = this.createTileMatrix();
+    console.log(this.tileMatrix);
+    console.log(this.tileMatrix[3][4]);
   }
 
   createTileMatrix(){
     var tempTileMatrix = [];
     for(var indexRows = 0; indexRows < this.numRows; indexRows++){
-      var tempRowArray = [];
+      var tempColArray = [];
       for(var indexColumns = 0; indexColumns < this.numCols; indexColumns++){
-        tempRowArray.push(new Tile(60 + 60 * indexRows, 100 + 60 * indexColumns));
+        tempColArray.push(new Tile(60 + 60 * indexRows, 100 + 60 * indexColumns));
       }
-      tempTileMatrix.push(tempRowArray);
+      tempTileMatrix.push(tempColArray);
     }
+    return tempTileMatrix;
   } // end CreateTileMatrix
 
 }
 
 var htmlGrid = document.getElementById('htmlGrid');
-var grid = new Grid(10, 10);
+var grid = new Grid(4, 7);
