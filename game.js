@@ -26,7 +26,6 @@ class Grid {
     this.tileMatrix = this.createTileMatrix();
     console.log(this.tileMatrix);
     console.log(this.tileMatrix[3][4]);
-    this.tileMatrix[1][1].hideTile();
   }
 
   createTileMatrix(){
