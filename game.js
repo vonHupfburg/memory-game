@@ -7,10 +7,10 @@ class Card{
   };
 
   createCard(){
-    var tempTile = document.createElement("div");
-    tempTile.className = "tile";
-    htmlGrid.appendChild(tempTile);
-    return tempTile;
+    var tempCard = document.createElement("div");
+    tempCard.className = "card";
+    htmlGrid.appendChild(tempCard);
+    return tempCard;
   }
 
   realignCard(){
@@ -23,21 +23,21 @@ class Grid {
   constructor(numRows, numCols) {
     this.numRows = numRows;
     this.numCols = numCols;
-    this.tileMatrix = this.createTileMatrix();
-    console.log(this.tileMatrix);
-    console.log(this.tileMatrix[3][4]);
+    this.cardMatrix = this.createTileMatrix();
+    console.log(this.cardMatrix);
+    console.log(this.cardMatrix[3][4]);
   }
 
   createTileMatrix(){
-    var tempTileMatrix = [];
+    var tempCardMatrix = [];
     for(var indexRows = 0; indexRows < this.numRows; indexRows++){
       var tempColArray = [];
       for(var indexColumns = 0; indexColumns < this.numCols; indexColumns++){
         tempColArray.push(new Card(60 + 60 * indexRows, 100 + 60 * indexColumns));
       }
-      tempTileMatrix.push(tempColArray);
+      tempCardMatrix.push(tempColArray);
     }
-    return tempTileMatrix;
+    return tempCardMatrix;
   } // end CreateTileMatrix
 
 }
