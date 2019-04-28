@@ -44,3 +44,5 @@ class Grid {
 
 var htmlGrid = document.getElementById('htmlGrid');
 var grid = new Grid(4, 7);
+
+var test = null;
