@@ -17,6 +17,12 @@ class Card{
       this.htmlElement.style.left = this.locX + "px";
       this.htmlElement.style.top = this.locY + "px";
   }
+
+  takeContent(srcLink){
+    var tempContent = document.createElement("img")
+    this.htmlElement.appendChild(tempContent);
+    tempContent.src = srcLink;
+  }
 }
 
 class Grid {
@@ -26,6 +32,7 @@ class Grid {
     this.cardMatrix = this.createTileMatrix();
     console.log(this.cardMatrix);
     console.log(this.cardMatrix[3][4]);
+
   }
 
   createTileMatrix(){
@@ -40,9 +47,20 @@ class Grid {
     return tempCardMatrix;
   } // end CreateTileMatrix
 
+
+}
+
+class CardType {
+  constructor(link) {
+    this.link = link;
+  }
 }
 
 var htmlGrid = document.getElementById('htmlGrid');
-var grid = new Grid(4, 7);
+var grid = new Grid(4, 5);
 
-var test = null;
+var cardTypeArray = []
+cardTypeArray.push(new CardType("images/seal.jpg"));
+cardTypeArray.push(new CardType("images/cow.jpg"));
+
+grid.cardMatrix[3][4].takeContent("images/seal.jpg");

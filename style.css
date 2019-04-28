@@ -8,3 +8,10 @@
   background: RGB(255,255,255);
   text-align: center;
 }
+
+.card img {
+  display: block;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
