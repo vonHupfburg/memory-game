@@ -1,9 +1,13 @@
 class Card{
-  constructor(locX, locY){
+  constructor(locX, locY, content){
     this.locX = locX;
     this.locY = locY;
+    this.content = content
     this.htmlElement = this.createCard();
+    this.imgElement = this.addImage();
+    //this.hideImage(false);
     this.realignCard();
+    //console.log(this.imgElement);
   };
 
   createCard(){
@@ -18,49 +22,109 @@ class Card{
       this.htmlElement.style.top = this.locY + "px";
   }
 
-  takeContent(srcLink){
+  addImage(cardType){
     var tempContent = document.createElement("img")
     this.htmlElement.appendChild(tempContent);
-    tempContent.src = srcLink;
+    tempContent.src = this.content.link;
+    return tempContent
+  }
+
+  hideImage(wantAnimation){
+    this.imgElement.style.display = "none";
   }
 }
 
 class Grid {
-  constructor(numRows, numCols) {
-    this.numRows = numRows;
-    this.numCols = numCols;
-    this.cardMatrix = this.createTileMatrix();
-    console.log(this.cardMatrix);
-    console.log(this.cardMatrix[3][4]);
-
+  constructor(cardTypeArray) {
+    this.cardTypeArray = cardTypeArray;
+    this.numRows = this.defineNumRows();
+    this.distributionArray = this.createDistributionArray();
+    this.cardArray = this.createCardArray();
   }
 
-  createTileMatrix(){
-    var tempCardMatrix = [];
-    for(var indexRows = 0; indexRows < this.numRows; indexRows++){
-      var tempColArray = [];
-      for(var indexColumns = 0; indexColumns < this.numCols; indexColumns++){
-        tempColArray.push(new Card(60 + 60 * indexRows, 100 + 60 * indexColumns));
+  defineNumRows(){
+    return Math.round(Math.sqrt(2 * this.cardTypeArray.length));
+  }
+
+  createCardArray(){
+    var tempCardArray = [];
+    var rowTrack = 0;
+    var colTrack = 0;
+    for (var arrayIndex = 0; arrayIndex < this.distributionArray.length; arrayIndex++){
+      tempCardArray.push(new Card(60 + 110 * rowTrack, 100 + 110 * colTrack, this.cardTypeArray[this.distributionArray[arrayIndex]]));
+      if (rowTrack !== this.numRows){
+        rowTrack++;
+      } else {
+        colTrack++;
+        rowTrack = 0;
       }
-      tempCardMatrix.push(tempColArray);
+
     }
-    return tempCardMatrix;
-  } // end CreateTileMatrix
+    return tempCardArray
+  }
 
+  createShadowArray(whichLength){
+    // Creates an array with a length of equal size to the array that needs to be shuffled and fills it with random reals.
+    var tempShadowArray = []
+    for (var index = 0; index < (whichLength * 2); index++){
+      tempShadowArray.push(Math.random());
+    }
+    return tempShadowArray;
+  }
 
+  createIndexArray(whichLength){
+    // Creates an array with a length of double size to the array that needs to be shuffled and fills it with the indexes.
+    var tempIndexArray = []
+    for (var index = 0; index < whichLength; index++){
+      tempIndexArray.push(index);
+      tempIndexArray.push(index);
+    }
+    return tempIndexArray;
+  }
+
+  createDistributionArray(){
+    var tempIndexArray = this.createIndexArray(this.cardTypeArray.length);
+    var tempShadowArray = this.createShadowArray(this.cardTypeArray.length);
+    var tempDistributionArray = [];
+
+    while (tempDistributionArray.length !== (2 * this.cardTypeArray.length)){
+      var tempReal = 1.00;
+      var tempIndex = 0;
+      for (var index = 0; index < tempShadowArray.length; index++){
+        if (tempShadowArray[index] < tempReal){
+          tempReal = tempShadowArray[index];
+          tempIndex = index;
+        }
+      }
+      // found lowest element: push to new distribution array
+      tempDistributionArray.push(tempIndexArray[tempIndex]);
+      // splice this value from the shadow array
+      tempShadowArray.splice(tempIndex,1);
+      // splice this value from the index array
+      tempIndexArray.splice(tempIndex,1);
+    }
+    return tempDistributionArray;
+  }
 }
 
 class CardType {
-  constructor(link) {
+  constructor(link, handle) {
     this.link = link;
+    this.handle = handle;
   }
 }
 
+var globalCardTypeArray = []
+globalCardTypeArray.push(new CardType("images/seal.jpg", "seal"));
+globalCardTypeArray.push(new CardType("images/cow.jpg", "cow"));
+globalCardTypeArray.push(new CardType("images/cat.jpg", "cat"));
+globalCardTypeArray.push(new CardType("images/donkey.jpg", "donkey"));
+globalCardTypeArray.push(new CardType("images/lajhar.jpg", "lajhar"));
+globalCardTypeArray.push(new CardType("images/lelefante.jpg", "elephant"));
+globalCardTypeArray.push(new CardType("images/dog.jpg", "dog"));
+globalCardTypeArray.push(new CardType("images/piglet.jpg", "piglet"));
+globalCardTypeArray.push(new CardType("images/monkey.jpg", "monkey"));
+globalCardTypeArray.push(new CardType("images/whale.jpg", "whale"));
+
 var htmlGrid = document.getElementById('htmlGrid');
-var grid = new Grid(4, 5);
-
-var cardTypeArray = []
-cardTypeArray.push(new CardType("images/seal.jpg"));
-cardTypeArray.push(new CardType("images/cow.jpg"));
-
-grid.cardMatrix[3][4].takeContent("images/seal.jpg");
+var grid = new Grid(globalCardTypeArray);

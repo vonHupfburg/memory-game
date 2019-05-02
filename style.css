@@ -1,8 +1,8 @@
 .card{
   position: absolute;
   display: block;
-  height: 50px;
-  width: 50px;
+  height: 100px;
+  width: 100px;
   margin: 1px;
   border:1px solid RGB(30,30,30);
   background: RGB(255,255,255);
@@ -12,6 +12,12 @@
 .card img {
   display: block;
   position: absolute;
-  top: 0;
-  width: 100%;
+  top: 50%;
+  left: 50%;
+  margin-left: -50px;
+  margin-top: -50px;
+  height: 100px;
+  width: 100px;
+  object-fit: cover;
+
 }
