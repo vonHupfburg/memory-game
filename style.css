@@ -5,19 +5,21 @@
   width: 100px;
   margin: 1px;
   border:1px solid RGB(30,30,30);
-  background: RGB(255,255,255);
+  border-radius: 5px 15px;
+  background: RGB(180,180,180);
   text-align: center;
 }
 
 .card img {
-  display: block;
   position: absolute;
+  object-fit: cover;
+  display: block;
+  border-radius: 5px 15px;
+  height: 100px;
+  width: 100px;
   top: 50%;
   left: 50%;
   margin-left: -50px;
   margin-top: -50px;
-  height: 100px;
-  width: 100px;
-  object-fit: cover;
 
 }
