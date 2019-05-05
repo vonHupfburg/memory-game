@@ -38,13 +38,16 @@ class Card{
   }
 
   htmlElementOnClick(){
-    console.log("a");
+    grid.trackMoves();
     if (this.isRevealed === false){
       this.showImage(true);
       grid.rememberReveal(this);
     } else {
       this.hideImage(true);
       grid.undoReveal(this);
+    }
+    if (grid.timeElapsed === -1){
+      grid.timeTick();
     }
   }
 
@@ -192,7 +195,15 @@ class Grid {
     this.numRows = this.defineNumRows();
     this.distributionArray = this.createDistributionArray();
     this.cardArray = this.createCardArray();
+    this.cardsToDismantle = this.cardArray.length;
     this.RevealedArray = [];
+    //
+    this.moves = 0;
+    this.timeElapsed = -1;
+    this.timer = null;
+    this.htmlElementTrackMoves = document.getElementById("trackMoves");
+    this.htmlElementTrackTime = document.getElementById("trackTime");
+    this.updateScorecard();
   }
 
   checkRevealMaximum(){
@@ -206,8 +217,6 @@ class Grid {
 
   checkIsEqual(){
     if (this.RevealedArray[0].content.handle === this.RevealedArray[1].content.handle){
-      console.log(this.RevealedArray[0].animationQueue);
-      console.log(this.RevealedArray[1].animationQueue);
       while (this.RevealedArray[0].animationQueue.length < this.RevealedArray[1].animationQueue.length){
         this.RevealedArray[0].queueAnimation("wait");
       }
@@ -216,8 +225,18 @@ class Grid {
       }
       this.RevealedArray[0].hideHtmlElement(true);
       this.RevealedArray[1].hideHtmlElement(true);
+      this.cardsToDismantle = this.cardsToDismantle - 2;
+      console.log(this.cardsToDismantle);
+      if (this.cardsToDismantle === 0){
+        this.playerVictory();
+      }
       this.RevealedArray = [];
     }
+  }
+
+  playerVictory(){
+    clearTimeout(this.timer);
+    this.innerHTML = "VICTORY!";
   }
 
   undoReveal(whichCard){
@@ -246,14 +265,13 @@ class Grid {
     var rowTrack = 0;
     var colTrack = 0;
     for (var arrayIndex = 0; arrayIndex < this.distributionArray.length; arrayIndex++){
-      tempCardArray.push(new Card(60 + 110 * rowTrack, 100 + 110 * colTrack, this.cardTypeArray[this.distributionArray[arrayIndex]]));
+      tempCardArray.push(new Card(60 + 110 * rowTrack, 150 + 110 * colTrack, this.cardTypeArray[this.distributionArray[arrayIndex]]));
       if (rowTrack !== this.numRows){
         rowTrack++;
       } else {
         colTrack++;
         rowTrack = 0;
       }
-
     }
     return tempCardArray
   }
@@ -299,6 +317,35 @@ class Grid {
       tempIndexArray.splice(tempIndex,1);
     }
     return tempDistributionArray;
+  }
+
+  updateScorecard(){
+    if (this.moves === 1){
+      this.htmlElementTrackMoves.textContent = "You have made 1 move.";
+    } else {
+      this.htmlElementTrackMoves.textContent = "You have made " + this.moves + " moves.";
+    }
+    if (this.timeElapsed === -1){
+      this.htmlElementTrackTime.textContent = "You haven't started this level yet."
+    } else if (this.timeElapsed === 1){
+      this.htmlElementTrackTime.textContent = "You have spent 1 second on this level."
+    } else if (this.timeElapsed <= 60) {
+      this.htmlElementTrackTime.textContent = "You have spent " + this.timeElapsed + " seconds on this level."
+    } else if (this.timeElapsed > 60 ) {
+      var tempInteger = Math.floor(this.timeElapsed/60);
+      this.htmlElementTrackTime.textContent = "You have spent " + tempInteger + " minutes and " + (this.timeElapsed - 60 * tempInteger) + " seconds on this level.";
+    }
+  }
+
+  trackMoves(){
+    this.moves = this.moves + 1;
+    this.updateScorecard();
+  }
+
+  timeTick(){
+    this.timeElapsed = this.timeElapsed + 1;
+    this.updateScorecard();
+    this.timer = window.setTimeout(this.timeTick.bind(this), 1000)
   }
 }
 
