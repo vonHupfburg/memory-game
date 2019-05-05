@@ -236,7 +236,6 @@ class Grid {
 
   playerVictory(){
     clearTimeout(this.timer);
-    this.innerHTML = "VICTORY!";
   }
 
   undoReveal(whichCard){
