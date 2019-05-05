@@ -11,7 +11,7 @@ class Card{
     this.hideImage(false);
     this.realignCard();
     // Clickable
-    this.htmlElement.addEventListener("click", this.onClick.bind(this));
+    this.htmlElement.addEventListener("click", this.htmlElementOnClick.bind(this));
     // CANDY
     this.animationQueue = [];
     this.animationBusy = false;
@@ -37,10 +37,14 @@ class Card{
     return tempContent
   }
 
-  onClick(){
+  htmlElementOnClick(){
+    console.log("a");
     if (this.isRevealed === false){
       this.showImage(true);
       grid.rememberReveal(this);
+    } else {
+      this.hideImage(true);
+      grid.undoReveal(this);
     }
   }
 
@@ -202,20 +206,25 @@ class Grid {
 
   checkIsEqual(){
     if (this.RevealedArray[0].content.handle === this.RevealedArray[1].content.handle){
-      console.log("yay you");
       console.log(this.RevealedArray[0].animationQueue);
       console.log(this.RevealedArray[1].animationQueue);
       while (this.RevealedArray[0].animationQueue.length < this.RevealedArray[1].animationQueue.length){
-        console.log("a")
         this.RevealedArray[0].queueAnimation("wait");
       }
       while (this.RevealedArray[1].animationQueue.length < this.RevealedArray[0].animationQueue.length){
-        console.log("b")
         this.RevealedArray[1].queueAnimation("wait");
       }
       this.RevealedArray[0].hideHtmlElement(true);
       this.RevealedArray[1].hideHtmlElement(true);
       this.RevealedArray = [];
+    }
+  }
+
+  undoReveal(whichCard){
+    if (this.RevealedArray[0] === whichCard){
+      this.RevealedArray.splice(0,1);
+    } else {
+      this.RevealedArray.splice(1,1);
     }
   }
 
