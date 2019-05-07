@@ -7,6 +7,7 @@ class Card{
     this.htmlElement = this.createCard();
     this.imgElement = this.addImage();
     this.isRevealed = false;
+    this.isClickable = true;
     // Init card
     this.hideImage(false);
     this.realignCard();
@@ -15,7 +16,6 @@ class Card{
     // CANDY
     this.animationQueue = [];
     this.animationBusy = false;
-    this.animationProgress = 0;
   };
 
   createCard(){
@@ -33,16 +33,16 @@ class Card{
   addImage(cardType){
     var tempContent = document.createElement("img")
     this.htmlElement.appendChild(tempContent);
-    tempContent.src = this.content.link;
+    tempContent.src = this.content.imgSrc;
     return tempContent
   }
 
   htmlElementOnClick(){
     grid.trackMoves();
-    if (this.isRevealed === false){
+    if (this.isRevealed === false && this.isClickable === true && this.animationBusy === false){
       this.showImage(true);
       grid.rememberReveal(this);
-    } else {
+    } else if (this.isRevealed === true && this.isClickable === true && this.animationBusy === false) {
       this.hideImage(true);
       grid.undoReveal(this);
     }
@@ -51,32 +51,30 @@ class Card{
     }
   }
 
+  showImage(wantAnimation){
+    this.isRevealed = true;
+    if (wantAnimation === true){
+      this.queueAnimation("show");
+    } else {
+      this.imgElement.style.visibility = "visible";
+    }
+  }
+
   hideImage(wantAnimation){
     this.isRevealed = false;
-    console.log("ZZZZ");
     if (wantAnimation === true){
       this.queueAnimation("hide");
     } else {
-      this.imgElement.style.display = "none";
+      this.imgElement.style.visibility = "hidden";
     }
   }
 
-  showImage(wantAnimation){
-    this.imgElement.style.display = "block";
-    this.isRevealed = true;
-    console.log("BBBB");
-    if (wantAnimation === true){
-      console.log("AAAA");
-      this.htmlElement.classList.add("animShowCard");
-    }
-  }
-
-  hideHtmlElement(wantAnimation){
-    console.log("BBBBB");
+  dismantleHtmlElement(wantAnimation){
+    this.isClickable = false;
     if (wantAnimation === true){
       this.queueAnimation("dismantle")
     } else {
-      this.htmlElement.style.display = "none";
+      this.htmlElement.style.visibility = "hidden";
     }
   }
 
@@ -86,7 +84,6 @@ class Card{
   }
 
   runAnimations(){
-    console.log(this.animationQueue);
     if (this.animationBusy === false && this.animationQueue.length !== 0){
       this.runNextAnimation();
     }
@@ -94,7 +91,6 @@ class Card{
 
   runNextAnimation(){
     this.animationBusy = true;
-    this.animationProgress = 0;
     if (this.animationQueue[0] === "show"){
       this.runAnimationShow();
     }
@@ -109,86 +105,60 @@ class Card{
     }
   }
 
+  cleanupAnimation(){
+    this.animationBusy = false;
+    this.animationQueue.splice(0, 1);
+    this.runAnimations();
+  }
+
   runAnimationShow(){
-    if (this.animationProgress < 100){
-      window.setTimeout(this.runAnimationShow.bind(this), 1);
-      this.animationProgress = this.animationProgress + 2;
-      if (this.animationProgress <= 40){
-        this.htmlElement.style.left = this.locX + (50/40) * this.animationProgress + "px";
-        this.htmlElement.style.width = (100 - 2.5 * this.animationProgress) + "px";
-        this.imgElement.style.display = "none";
-      }
-      if (this.animationProgress > 60){
-        this.htmlElement.style.left = this.locX + 50 - (50/40) * (this.animationProgress - 60) + "px"
-        this.htmlElement.style.width = (-150 + 2.5 * this.animationProgress) + "px";
-        this.imgElement.style.left = 50 + "px";
-        this.imgElement.style.width = (-150 + 2.5 * this.animationProgress) + "px";
-        this.imgElement.style.display = "block";
-      }
-    } else {
-      this.animationProgress = 0;
-      this.animationBusy = false;
-      this.animationQueue.splice(0, 1);
-      this.runAnimations();
-    }
+    this.htmlElement.classList.add("cardAnimShowHide");
+    this.imgElement.classList.add("cardImgAnimShow");
+    this.imgElement.style.visibility = "visible"
+    window.setTimeout(this.runAnimationShowCallback.bind(this), 1000);
+  }
+
+  runAnimationShowCallback(){
+    this.htmlElement.classList.remove("cardAnimShowHide");
+    this.imgElement.classList.remove("cardImgAnimShow");
+    this.cleanupAnimation();
   }
 
   runAnimationHide(){
-    if (this.animationProgress < 100){
-      window.setTimeout(this.runAnimationHide.bind(this), 1);
-      this.animationProgress = this.animationProgress + 2;
-      if (this.animationProgress > 60){
-        this.htmlElement.style.left = this.locX + (50/40) * (100 - this.animationProgress) + "px";
-        this.htmlElement.style.width = (100 - 2.5 * (100 - this.animationProgress)) + "px";
-        this.imgElement.style.display = "none";
-      }
-      if (this.animationProgress <= 40){
-        this.htmlElement.style.left = this.locX + 50 - (50/40) * ((100 - this.animationProgress) - 60) + "px"
-        this.htmlElement.style.width = (-150 + 2.5 * (100 - this.animationProgress)) + "px";
-        this.imgElement.style.left = 50 + "px";
-        this.imgElement.style.width = (-150 + 2.5 * (100 - this.animationProgress)) + "px";
-        this.imgElement.style.display = "block";
-      }
-    } else {
-      this.animationProgress = 0;
-      this.animationBusy = false;
-      this.animationQueue.splice(0, 1);
-      this.runAnimations();
-    }
+    this.htmlElement.classList.add("cardAnimShowHide");
+    this.imgElement.classList.add("cardImgAnimHide");
+    this.imgElement.style.visibility = "hidden";
+    window.setTimeout(this.runAnimationHideCallback.bind(this), 1000);
+  }
+
+  runAnimationHideCallback(){
+    this.htmlElement.classList.remove("cardAnimShowHide");
+    this.imgElement.classList.remove("cardImgAnimHide");
+    this.cleanupAnimation();
   }
 
   runAnimationWait(){
-    if (this.animationProgress < 100){
-      window.setTimeout(this.runAnimationWait.bind(this), 1);
-      this.animationProgress = this.animationProgress + 2;
-    } else {
-      this.animationProgress = 0;
-      this.animationBusy = false;
-      this.animationQueue.splice(0, 1);
-      this.runAnimations();
-    }
+    window.setTimeout(this.runAnimationWaitCallback.bind(this), 1000);
+  }
+
+  runAnimationWaitCallback(){
+    this.cleanupAnimation();
   }
 
   runAnimationDismantle(){
-    if (this.animationProgress < 100){
-      window.setTimeout(this.runAnimationDismantle.bind(this), 2);
-      this.animationProgress = this.animationProgress + 0.5;
-      this.imgElement.style.width = (100 - this.animationProgress) + "px";
-      this.imgElement.style.height = (100 - this.animationProgress) + "px";
-      this.imgElement.style.left = 50 + "px";
-      this.imgElement.style.top = 50 + "px";
-      this.htmlElement.style.width = (100 - this.animationProgress) + "px";
-      this.htmlElement.style.height = (100 - this.animationProgress) + "px";
-      this.htmlElement.style.top = this.locY + 0.5 * this.animationProgress + "px"
-      this.htmlElement.style.left = this.locX + 0.5 * this.animationProgress + "px"
-    } else {
-      this.animationProgress = 0;
-      this.animationBusy = false;
-      this.animationQueue = []
-      this.htmlElement.style.display = "none";
-      this.imgElement.style.display = "none";
-    }
+    this.htmlElement.classList.add("cardAnimDismantle");
+    this.imgElement.classList.add("cardImgAnimDismantle");
+    window.setTimeout(this.runAnimationDismantleCallback.bind(this), 1000);
   }
+
+  runAnimationDismantleCallback(){
+    this.htmlElement.classList.remove("cardAnimDismantle");
+    this.imgElement.classList.remove("cardImgAnimDismantleCallback");
+    this.imgElement.style.visibility = "hidden";
+    this.htmlElement.style.visibility = "hidden";
+    this.cleanupAnimation();
+  }
+
 }
 
 class Grid {
@@ -219,16 +189,18 @@ class Grid {
 
   checkIsEqual(){
     if (this.RevealedArray[0].content.handle === this.RevealedArray[1].content.handle){
+      // TODO: Peg animation timer. Wait must know how long to wait otherwise it adds the delay on user clicks.
+      console.log(this.RevealedArray[0].animationQueue);
+      console.log(this.RevealedArray[1].animationQueue);
       while (this.RevealedArray[0].animationQueue.length < this.RevealedArray[1].animationQueue.length){
         this.RevealedArray[0].queueAnimation("wait");
       }
       while (this.RevealedArray[1].animationQueue.length < this.RevealedArray[0].animationQueue.length){
         this.RevealedArray[1].queueAnimation("wait");
       }
-      this.RevealedArray[0].hideHtmlElement(true);
-      this.RevealedArray[1].hideHtmlElement(true);
+      this.RevealedArray[0].dismantleHtmlElement(true);
+      this.RevealedArray[1].dismantleHtmlElement(true);
       this.cardsToDismantle = this.cardsToDismantle - 2;
-      console.log(this.cardsToDismantle);
       if (this.cardsToDismantle === 0){
         this.playerVictory();
       }
@@ -257,7 +229,6 @@ class Grid {
   }
 
   defineNumRows(){
-    console.log(this.cardTypeArray.length);
     return Math.round(Math.sqrt(2 * this.cardTypeArray.length));
   }
 
@@ -351,8 +322,8 @@ class Grid {
 }
 
 class CardType {
-  constructor(srcImg, handle) {
-    this.srcImg = srcImg;
+  constructor(imgSrc, handle) {
+    this.imgSrc = imgSrc;
     this.handle = handle;
   }
 }
