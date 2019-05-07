@@ -21,5 +21,14 @@
   left: 50%;
   margin-left: -50px;
   margin-top: -50px;
+  animation-name: none;
+}
 
+.animShowCard{
+  animation: showCard 5s infinite;
+}
+
+@keyframes showCard {
+  0% {top: 0px;}
+  25% {top: 200px;}
 }

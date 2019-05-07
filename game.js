@@ -64,8 +64,10 @@ class Card{
   showImage(wantAnimation){
     this.imgElement.style.display = "block";
     this.isRevealed = true;
+    console.log("BBBB");
     if (wantAnimation === true){
-      this.queueAnimation("show");
+      console.log("AAAA");
+      this.htmlElement.classList.add("animShowCard");
     }
   }
 
@@ -349,25 +351,17 @@ class Grid {
 }
 
 class CardType {
-  constructor(link, handle) {
-    this.link = link;
+  constructor(srcImg, handle) {
+    this.srcImg = srcImg;
     this.handle = handle;
   }
 }
 
-var globalCardTypeArray = []
-
-globalCardTypeArray.push(new CardType("images/seal.jpg", "seal"));
-globalCardTypeArray.push(new CardType("images/cow.jpg", "cow"));
-globalCardTypeArray.push(new CardType("images/cat.jpg", "cat"));
-globalCardTypeArray.push(new CardType("images/donkey.jpg", "donkey"));
-globalCardTypeArray.push(new CardType("images/lajhar.jpg", "lajhar"));
-globalCardTypeArray.push(new CardType("images/lelefante.jpg", "elephant"));
-globalCardTypeArray.push(new CardType("images/dog.jpg", "dog"));
-globalCardTypeArray.push(new CardType("images/piglet.jpg", "piglet"));
-globalCardTypeArray.push(new CardType("images/monkey.jpg", "monkey"));
-globalCardTypeArray.push(new CardType("images/whale.jpg", "whale"));
-globalCardTypeArray.push(new CardType("images/rat.jpg", "rat"));
+var globalCardTypeArray = [];
+var srcArray = ["images/seal.jpg", "images/cow.jpg", "images/cat.jpg", "images/donkey.jpg", "images/lajhar.jpg", "images/lelefante.jpg", "images/dog.jpg", "images/piglet.jpg", "images/monkey.jpg", "images/whale.jpg", "images/rat.jpg"]
+for (var index = 0; index < srcArray.length; index++){
+  globalCardTypeArray.push(new CardType(srcArray[index], index));
+}
 
 var htmlGrid = document.getElementById('htmlGrid');
 var grid = new Grid(globalCardTypeArray);
