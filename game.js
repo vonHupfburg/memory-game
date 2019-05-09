@@ -158,14 +158,13 @@ class Card{
 
 class Grid {
   constructor(numImages, numLevel) {
-    console.log("busya")
     this.cardTypeArray = this.getCardTypeArray(numImages);
     this.numRows = this.defineNumRows();
+    console.log(this.numRows);
+    // TODO: This actually renders less rows than I wanted.
     this.distributionArray = this.createDistributionArray();
     this.cardArray = this.createCardArray();
     this.cardsToDismantle = this.cardArray.length;
-    console.log("busyb")
-    console.log(this.cardsToDismantle);
     this.revealedArray = [];
     // Trackers:
     this.trackMovesNumMoves = 0;
@@ -176,7 +175,6 @@ class Grid {
     this.htmlElementTrackTime = document.getElementById("trackTime");
     this.htmlElementTrackLevel = document.getElementById("trackLevel");
     this.updateScorecard();
-    console.log(this.cardsToDismantle);
   }
 
   getCardTypeArray(numImages){
@@ -215,7 +213,6 @@ class Grid {
       this.revealedArray[0].destroyCard(true);
       this.revealedArray[1].destroyCard(true);
       this.cardsToDismantle = this.cardsToDismantle - 2;
-      console.log(this.cardsToDismantle)
       if (this.cardsToDismantle === 0){
         this.victory();
       }
@@ -224,7 +221,6 @@ class Grid {
   }
 
   victory(){
-    console.log("yay");
     clearTimeout(this.trackTimeTimer);
     // Start next level.
     this.runAnimVictory();
@@ -236,8 +232,7 @@ class Grid {
 
   runAnimVictoryCallback(){
     this.trackLevelValue++
-    grid = null;
-    var grid = new Grid(2 + this.trackLevelValue, this.trackLevelValue);
+    startNextLevel(2 + this.trackLevelValue, this.trackLevelValue);
   }
 
   undoReveal(whichCard){
@@ -363,4 +358,10 @@ for (var index = 0; index < srcArray.length; index++){
 }
 
 var htmlGrid = document.getElementById('htmlGrid');
-var grid = new Grid(3, 1);
+
+var grid = null;
+function startNextLevel(numCards, whichLevel){
+  grid = new Grid(numCards, whichLevel);
+}
+
+startNextLevel(3, 1);
