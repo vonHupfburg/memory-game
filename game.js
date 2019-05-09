@@ -1,22 +1,25 @@
 class Card{
   constructor(locX, locY, content){
-    // PROPS
     this.locX = locX;
     this.locY = locY;
     this.content = content
     this.htmlElement = this.createCard();
     this.imgElement = this.addImage();
     this.isRevealed = false;
-    this.isClickable = true;
-    // Init card
-    this.hideImage(false);
-    this.realignCard();
-    // Clickable
-    this.htmlElement.addEventListener("click", this.htmlElementOnClick.bind(this));
-    // CANDY
     this.animationQueue = [];
-    this.animationBusy = false;
-  };
+    this.animationIsBusy = false;
+    this.realignCard();
+    this.queueAnimation("appear");
+    this.htmlElement.addEventListener("click", this.htmlElementOnClick.bind(this));
+  }
+
+  addImage(cardType){
+    var tempContent = document.createElement("img")
+    this.htmlElement.appendChild(tempContent);
+    tempContent.src = this.content.imgSrc;
+    tempContent.style.visibility = "hidden";
+    return tempContent
+  }
 
   createCard(){
     var tempCard = document.createElement("div");
@@ -25,57 +28,39 @@ class Card{
     return tempCard;
   }
 
-  realignCard(){
-      this.htmlElement.style.left = this.locX + "px";
-      this.htmlElement.style.top = this.locY + "px";
+  destroyCard(){
+    this.isClickable = false;
+    this.queueAnimation("destroy")
   }
 
-  addImage(cardType){
-    var tempContent = document.createElement("img")
-    this.htmlElement.appendChild(tempContent);
-    tempContent.src = this.content.imgSrc;
-    return tempContent
+  realignCard(){
+    this.htmlElement.style.left = this.locX + "px";
+    this.htmlElement.style.top = this.locY + "px";
   }
 
   htmlElementOnClick(){
     grid.trackMoves();
-    if (this.isRevealed === false && this.isClickable === true && this.animationBusy === false){
-      this.showImage(true);
+    if (this.isRevealed === false && this.animationIsBusy === false){
+      this.showImage();
       grid.rememberReveal(this);
-    } else if (this.isRevealed === true && this.isClickable === true && this.animationBusy === false) {
-      this.hideImage(true);
+    } else if (this.isRevealed === true && this.animationIsBusy === false) {
+      this.hideImage();
       grid.undoReveal(this);
     }
-    if (grid.timeElapsed === -1){
-      grid.timeTick();
+    if (grid.trackTimeTimeElapsed === -1){
+      grid.trackTime();
     }
   }
 
-  showImage(wantAnimation){
+  showImage(){
     this.isRevealed = true;
-    if (wantAnimation === true){
-      this.queueAnimation("show");
-    } else {
-      this.imgElement.style.visibility = "visible";
-    }
+    this.queueAnimation("show");
   }
 
-  hideImage(wantAnimation){
+  hideImage(){
     this.isRevealed = false;
-    if (wantAnimation === true){
-      this.queueAnimation("hide");
-    } else {
-      this.imgElement.style.visibility = "hidden";
-    }
-  }
+    this.queueAnimation("hide");
 
-  dismantleHtmlElement(wantAnimation){
-    this.isClickable = false;
-    if (wantAnimation === true){
-      this.queueAnimation("dismantle")
-    } else {
-      this.htmlElement.style.visibility = "hidden";
-    }
   }
 
   queueAnimation(whichAnimation){
@@ -84,146 +69,189 @@ class Card{
   }
 
   runAnimations(){
-    if (this.animationBusy === false && this.animationQueue.length !== 0){
+    if (this.animationIsBusy === false && this.animationQueue.length !== 0){
       this.runNextAnimation();
     }
   }
 
   runNextAnimation(){
-    this.animationBusy = true;
+    this.animationIsBusy = true;
     if (this.animationQueue[0] === "show"){
-      this.runAnimationShow();
+      this.runAnimShow();
     }
     if (this.animationQueue[0] === "hide"){
-      this.runAnimationHide();
+      this.runAnimHide();
     }
     if (this.animationQueue[0] === "wait"){
-      this.runAnimationWait();
+      this.runAnimWait();
     }
-    if (this.animationQueue[0] === "dismantle"){
-      this.runAnimationDismantle();
+    if (this.animationQueue[0] === "destroy"){
+      this.runAnimDestroy();
+    }
+    if (this.animationQueue[0] === "appear"){
+      this.runAnimAppear();
     }
   }
 
   cleanupAnimation(){
-    this.animationBusy = false;
+    this.animationIsBusy = false;
     this.animationQueue.splice(0, 1);
     this.runAnimations();
   }
 
-  runAnimationShow(){
+  runAnimShow(){
     this.htmlElement.classList.add("cardAnimShowHide");
     this.imgElement.classList.add("cardImgAnimShow");
     this.imgElement.style.visibility = "visible"
-    window.setTimeout(this.runAnimationShowCallback.bind(this), 1000);
+    window.setTimeout(this.runAnimShowCallback.bind(this), 500);
   }
 
-  runAnimationShowCallback(){
+  runAnimShowCallback(){
     this.htmlElement.classList.remove("cardAnimShowHide");
     this.imgElement.classList.remove("cardImgAnimShow");
     this.cleanupAnimation();
   }
 
-  runAnimationHide(){
+  runAnimHide(){
     this.htmlElement.classList.add("cardAnimShowHide");
     this.imgElement.classList.add("cardImgAnimHide");
     this.imgElement.style.visibility = "hidden";
-    window.setTimeout(this.runAnimationHideCallback.bind(this), 1000);
+    window.setTimeout(this.runAnimHideCallback.bind(this), 500);
   }
 
-  runAnimationHideCallback(){
+  runAnimHideCallback(){
     this.htmlElement.classList.remove("cardAnimShowHide");
     this.imgElement.classList.remove("cardImgAnimHide");
     this.cleanupAnimation();
   }
 
-  runAnimationWait(){
-    window.setTimeout(this.runAnimationWaitCallback.bind(this), 1000);
+  runAnimWait(){
+    window.setTimeout(this.runAnimWaitCallback.bind(this), 500);
   }
 
-  runAnimationWaitCallback(){
+  runAnimWaitCallback(){
     this.cleanupAnimation();
   }
 
-  runAnimationDismantle(){
-    this.htmlElement.classList.add("cardAnimDismantle");
-    this.imgElement.classList.add("cardImgAnimDismantle");
-    window.setTimeout(this.runAnimationDismantleCallback.bind(this), 1000);
+  runAnimDestroy(){
+    this.htmlElement.classList.add("cardAnimDestroy");
+    this.imgElement.classList.add("cardImgAnimDestroy");
+    window.setTimeout(this.runAnimDestroyCallback.bind(this), 500);
   }
 
-  runAnimationDismantleCallback(){
-    this.htmlElement.classList.remove("cardAnimDismantle");
-    this.imgElement.classList.remove("cardImgAnimDismantleCallback");
+  runAnimDestroyCallback(){
+    this.htmlElement.classList.remove("cardAnimDestroy");
+    this.imgElement.classList.remove("cardImgAnimDestroyCallback");
     this.imgElement.style.visibility = "hidden";
     this.htmlElement.style.visibility = "hidden";
+    htmlGrid.removeChild(this.htmlElement);
+    this.htmlElement.removeChild(this.imgElement);
+    this.htmlElement.remove();
+    this.imgElement.remove();
     this.cleanupAnimation();
   }
 
+  runAnimAppear(){
+    this.cleanupAnimation();
+  }
 }
 
 class Grid {
-  constructor(cardTypeArray) {
-    this.cardTypeArray = cardTypeArray;
+  constructor(numImages, numLevel) {
+    console.log("busya")
+    this.cardTypeArray = this.getCardTypeArray(numImages);
     this.numRows = this.defineNumRows();
     this.distributionArray = this.createDistributionArray();
     this.cardArray = this.createCardArray();
     this.cardsToDismantle = this.cardArray.length;
-    this.RevealedArray = [];
-    //
-    this.moves = 0;
-    this.timeElapsed = -1;
-    this.timer = null;
+    console.log("busyb")
+    console.log(this.cardsToDismantle);
+    this.revealedArray = [];
+    // Trackers:
+    this.trackMovesNumMoves = 0;
+    this.trackTimeTimeElapsed = -1;
+    this.trackTimeTimer = null;
+    this.trackLevelValue = numLevel;
     this.htmlElementTrackMoves = document.getElementById("trackMoves");
     this.htmlElementTrackTime = document.getElementById("trackTime");
+    this.htmlElementTrackLevel = document.getElementById("trackLevel");
     this.updateScorecard();
+    console.log(this.cardsToDismantle);
+  }
+
+  getCardTypeArray(numImages){
+    var tempCardArray = [];
+    //
+    if (numImages > globalCardTypeArray.length){
+      numImages = globalCardTypeArray.length;
+    }
+    for (var index = 0; index < globalCardTypeArray.length; index++){
+      tempCardArray.push(globalCardTypeArray[index]);
+    }
+    while (tempCardArray.length !== numImages){
+      tempCardArray.splice(Math.floor(Math.random()*tempCardArray.length), 1);
+    }
+    //
+    return tempCardArray;
   }
 
   checkRevealMaximum(){
-    if (this.RevealedArray.length === 2){
+    if (this.revealedArray.length === 2){
       for (var index = 0; index < 2; index++){
-        this.RevealedArray[index].hideImage(true);
+        this.revealedArray[index].hideImage(true);
       }
-      this.RevealedArray = [];
+      this.revealedArray = [];
     }
   }
 
   checkIsEqual(){
-    if (this.RevealedArray[0].content.handle === this.RevealedArray[1].content.handle){
-      // TODO: Peg animation timer. Wait must know how long to wait otherwise it adds the delay on user clicks.
-      console.log(this.RevealedArray[0].animationQueue);
-      console.log(this.RevealedArray[1].animationQueue);
-      while (this.RevealedArray[0].animationQueue.length < this.RevealedArray[1].animationQueue.length){
-        this.RevealedArray[0].queueAnimation("wait");
+    if (this.revealedArray[0].content.handle === this.revealedArray[1].content.handle){
+      while (this.revealedArray[0].animationQueue.length < this.revealedArray[1].animationQueue.length){
+        this.revealedArray[0].queueAnimation("wait");
       }
-      while (this.RevealedArray[1].animationQueue.length < this.RevealedArray[0].animationQueue.length){
-        this.RevealedArray[1].queueAnimation("wait");
+      while (this.revealedArray[1].animationQueue.length < this.revealedArray[0].animationQueue.length){
+        this.revealedArray[1].queueAnimation("wait");
       }
-      this.RevealedArray[0].dismantleHtmlElement(true);
-      this.RevealedArray[1].dismantleHtmlElement(true);
+      this.revealedArray[0].destroyCard(true);
+      this.revealedArray[1].destroyCard(true);
       this.cardsToDismantle = this.cardsToDismantle - 2;
+      console.log(this.cardsToDismantle)
       if (this.cardsToDismantle === 0){
-        this.playerVictory();
+        this.victory();
       }
-      this.RevealedArray = [];
+      this.revealedArray = [];
     }
   }
 
-  playerVictory(){
-    clearTimeout(this.timer);
+  victory(){
+    console.log("yay");
+    clearTimeout(this.trackTimeTimer);
+    // Start next level.
+    this.runAnimVictory();
+  }
+
+  runAnimVictory(){
+    window.setTimeout(this.runAnimVictoryCallback.bind(this), 5000);
+  }
+
+  runAnimVictoryCallback(){
+    this.trackLevelValue++
+    grid = null;
+    var grid = new Grid(2 + this.trackLevelValue, this.trackLevelValue);
   }
 
   undoReveal(whichCard){
-    if (this.RevealedArray[0] === whichCard){
-      this.RevealedArray.splice(0,1);
+    if (this.revealedArray[0] === whichCard){
+      this.revealedArray.splice(0,1);
     } else {
-      this.RevealedArray.splice(1,1);
+      this.revealedArray.splice(1,1);
     }
   }
 
   rememberReveal(whichCard){
     this.checkRevealMaximum();
-    this.RevealedArray.push(whichCard);
-    if (this.RevealedArray.length === 2){
+    this.revealedArray.push(whichCard);
+    if (this.revealedArray.length === 2){
       this.checkIsEqual();
     }
   }
@@ -237,7 +265,7 @@ class Grid {
     var rowTrack = 0;
     var colTrack = 0;
     for (var arrayIndex = 0; arrayIndex < this.distributionArray.length; arrayIndex++){
-      tempCardArray.push(new Card(60 + 110 * rowTrack, 150 + 110 * colTrack, this.cardTypeArray[this.distributionArray[arrayIndex]]));
+      tempCardArray.push(new Card(60 + 110 * rowTrack, 180 + 110 * colTrack, this.cardTypeArray[this.distributionArray[arrayIndex]]));
       if (rowTrack !== this.numRows){
         rowTrack++;
       } else {
@@ -292,32 +320,32 @@ class Grid {
   }
 
   updateScorecard(){
-    if (this.moves === 1){
-      this.htmlElementTrackMoves.textContent = "You have made 1 move.";
+    this.htmlElementTrackLevel.textContent = "You are on Level " + this.trackLevelValue + ".";
+    if (this.trackMovesNumMoves === 1){
+      this.htmlElementTrackMoves.textContent = "You have made 1 move this level.";
     } else {
-      this.htmlElementTrackMoves.textContent = "You have made " + this.moves + " moves.";
+      this.htmlElementTrackMoves.textContent = "You have made " + this.trackMovesNumMoves + " moves this level.";
     }
-    if (this.timeElapsed === -1){
+    if (this.trackTimeTimeElapsed === -1){
       this.htmlElementTrackTime.textContent = "You haven't started this level yet."
-    } else if (this.timeElapsed === 1){
+    } else if (this.trackTimeTimeElapsed === 1){
       this.htmlElementTrackTime.textContent = "You have spent 1 second on this level."
-    } else if (this.timeElapsed <= 60) {
-      this.htmlElementTrackTime.textContent = "You have spent " + this.timeElapsed + " seconds on this level."
-    } else if (this.timeElapsed > 60 ) {
-      var tempInteger = Math.floor(this.timeElapsed/60);
+    } else if (this.trackTimeTimeElapsed <= 60) {
+      this.htmlElementTrackTime.textContent = "You have spent " + this.trackTimeTimeElapsed + " seconds on this level."
+    } else if (this.trackTimeTimeElapsed > 60 ) {
+      var tempInteger = Math.floor(this.trackTimeTimeElapsed/60);
       this.htmlElementTrackTime.textContent = "You have spent " + tempInteger + " minutes and " + (this.timeElapsed - 60 * tempInteger) + " seconds on this level.";
     }
   }
 
   trackMoves(){
-    this.moves = this.moves + 1;
+    this.trackMovesNumMoves++;
     this.updateScorecard();
   }
 
-  timeTick(){
-    this.timeElapsed = this.timeElapsed + 1;
-    this.updateScorecard();
-    this.timer = window.setTimeout(this.timeTick.bind(this), 1000)
+  trackTime(){
+    this.trackTimeTimeElapsed++;
+    window.setTimeout(this.trackTime.bind(this),1000);
   }
 }
 
@@ -335,4 +363,4 @@ for (var index = 0; index < srcArray.length; index++){
 }
 
 var htmlGrid = document.getElementById('htmlGrid');
-var grid = new Grid(globalCardTypeArray);
+var grid = new Grid(3, 1);

@@ -25,27 +25,27 @@
 
 .cardAnimShowHide{
   animation-name: cardAnimShowHide;
-  animation-duration: 1s;
+  animation-duration: 0.5s;
 }
 
-.cardAnimDismantle{
-  animation-name: cardAnimDismantle;
-  animation-duration: 1s;
+.cardAnimDestroy{
+  animation-name: cardAnimDestroy;
+  animation-duration: 0.5s;
 }
 
 .cardImgAnimShow{
   animation-name: cardImgAnimShow;
-  animation-duration: 1s;
+  animation-duration: 0.5s;
 }
 
 .cardImgAnimHide{
   animation-name: cardImgAnimHide;
-  animation-duration: 1s;
+  animation-duration: 0.5s;
 }
 
-.cardImgAnimDismantle{
-  animation-name: cardImgAnimDismantle;
-  animation-duration: 1s;
+.cardImgAnimDestroy{
+  animation-name: cardImgAnimDestroy;
+  animation-duration: 0.5s;
 }
 
 @-webkit-keyframes cardAnimShowHide {
@@ -55,7 +55,7 @@
   100% {width: 100px; margin-left: 0px;}
 }
 
-@-webkit-keyframes cardAnimDismantle {
+@-webkit-keyframes cardAnimDestroy {
   0% {width: 100px; margin-left: 0px; height: 100px; margin-top: 0px;}
   100% {width: 0px; margin-left: 50px; height: 0px; margin-top: 50px;}
 }
@@ -74,7 +74,7 @@
   100% {visibility: hidden; width: 100px; margin-left: -50px;}
 }
 
-@-webkit-keyframes cardImgAnimDismantle{
+@-webkit-keyframes cardImgAnimDestroy {
   0% {width: 100px; margin-left: -50px; height: 100px; margin-top: -50px;}
   100% {width: 0px; margin-left: 0px; height: 0px; margin-top: 0px;}
 }
