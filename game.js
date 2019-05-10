@@ -102,7 +102,7 @@ class Card{
   runAnimShow(){
     this.htmlElement.classList.add("cardAnimShowHide");
     this.imgElement.classList.add("cardImgAnimShow");
-    this.imgElement.style.visibility = "visible"
+    this.imgElement.style.visibility = "visible";
     window.setTimeout(this.runAnimShowCallback.bind(this), 500);
   }
 
@@ -142,8 +142,6 @@ class Card{
   runAnimDestroyCallback(){
     this.htmlElement.classList.remove("cardAnimDestroy");
     this.imgElement.classList.remove("cardImgAnimDestroyCallback");
-    this.imgElement.style.visibility = "hidden";
-    this.htmlElement.style.visibility = "hidden";
     htmlGrid.removeChild(this.htmlElement);
     this.htmlElement.removeChild(this.imgElement);
     this.htmlElement.remove();
@@ -152,6 +150,13 @@ class Card{
   }
 
   runAnimAppear(){
+    this.htmlElement.classList.add("cardAnimAppear");
+    window.setTimeout(this.runAnimAppearCallback.bind(this), 500);
+    this.cleanupAnimation();
+  }
+
+  runAnimAppearCallback(){
+    this.htmlElement.classList.remove("cardAnimAppear");
     this.cleanupAnimation();
   }
 }
@@ -160,8 +165,6 @@ class Grid {
   constructor(numImages, numLevel) {
     this.cardTypeArray = this.getCardTypeArray(numImages);
     this.numRows = this.defineNumRows();
-    console.log(this.numRows);
-    // TODO: This actually renders less rows than I wanted.
     this.distributionArray = this.createDistributionArray();
     this.cardArray = this.createCardArray();
     this.cardsToDismantle = this.cardArray.length;
@@ -177,78 +180,23 @@ class Grid {
     this.updateScorecard();
   }
 
+  // STATIC: Only ever called once by constructor.
+
   getCardTypeArray(numImages){
     var tempCardArray = [];
-    //
+    // FAILSAFE: Can't have more cards than I have images for.
     if (numImages > globalCardTypeArray.length){
       numImages = globalCardTypeArray.length;
     }
+    // Create an initial array containing all the possible images.
     for (var index = 0; index < globalCardTypeArray.length; index++){
       tempCardArray.push(globalCardTypeArray[index]);
     }
+    // Splice an image each iteration until I have numImages many images.
     while (tempCardArray.length !== numImages){
       tempCardArray.splice(Math.floor(Math.random()*tempCardArray.length), 1);
     }
-    //
     return tempCardArray;
-  }
-
-  checkRevealMaximum(){
-    if (this.revealedArray.length === 2){
-      for (var index = 0; index < 2; index++){
-        this.revealedArray[index].hideImage(true);
-      }
-      this.revealedArray = [];
-    }
-  }
-
-  checkIsEqual(){
-    if (this.revealedArray[0].content.handle === this.revealedArray[1].content.handle){
-      while (this.revealedArray[0].animationQueue.length < this.revealedArray[1].animationQueue.length){
-        this.revealedArray[0].queueAnimation("wait");
-      }
-      while (this.revealedArray[1].animationQueue.length < this.revealedArray[0].animationQueue.length){
-        this.revealedArray[1].queueAnimation("wait");
-      }
-      this.revealedArray[0].destroyCard(true);
-      this.revealedArray[1].destroyCard(true);
-      this.cardsToDismantle = this.cardsToDismantle - 2;
-      if (this.cardsToDismantle === 0){
-        this.victory();
-      }
-      this.revealedArray = [];
-    }
-  }
-
-  victory(){
-    clearTimeout(this.trackTimeTimer);
-    // Start next level.
-    this.runAnimVictory();
-  }
-
-  runAnimVictory(){
-    window.setTimeout(this.runAnimVictoryCallback.bind(this), 5000);
-  }
-
-  runAnimVictoryCallback(){
-    this.trackLevelValue++
-    startNextLevel(2 + this.trackLevelValue, this.trackLevelValue);
-  }
-
-  undoReveal(whichCard){
-    if (this.revealedArray[0] === whichCard){
-      this.revealedArray.splice(0,1);
-    } else {
-      this.revealedArray.splice(1,1);
-    }
-  }
-
-  rememberReveal(whichCard){
-    this.checkRevealMaximum();
-    this.revealedArray.push(whichCard);
-    if (this.revealedArray.length === 2){
-      this.checkIsEqual();
-    }
   }
 
   defineNumRows(){
@@ -261,7 +209,11 @@ class Grid {
     var colTrack = 0;
     for (var arrayIndex = 0; arrayIndex < this.distributionArray.length; arrayIndex++){
       tempCardArray.push(new Card(60 + 110 * rowTrack, 180 + 110 * colTrack, this.cardTypeArray[this.distributionArray[arrayIndex]]));
-      if (rowTrack !== this.numRows){
+      console.log("A")
+      console.log(rowTrack);
+      console.log(colTrack);
+      console.log(this.numRows);
+      if (rowTrack !== (this.numRows - 1)){
         rowTrack++;
       } else {
         colTrack++;
@@ -314,13 +266,70 @@ class Grid {
     return tempDistributionArray;
   }
 
+  // DYNAMIC: Multiple uses.
+
+  checkRevealMaximum(){
+    if (this.revealedArray.length === 2){
+      for (var index = 0; index < 2; index++){
+        this.revealedArray[index].hideImage(true);
+      }
+      this.revealedArray = [];
+    }
+  }
+
+  checkIsEqual(){
+    if (this.revealedArray[0].content.handle === this.revealedArray[1].content.handle){
+      // This part makes sure cards don't disappear before their respective counterpart can finish their show animation
+      // by adding as many waits as the other card still has in its animationQueue.
+      while (this.revealedArray[0].animationQueue.length < this.revealedArray[1].animationQueue.length){
+        this.revealedArray[0].queueAnimation("wait");
+      }
+      while (this.revealedArray[1].animationQueue.length < this.revealedArray[0].animationQueue.length){
+        this.revealedArray[1].queueAnimation("wait");
+      }
+      // These cards are removed.
+      this.revealedArray[0].destroyCard(true);
+      this.revealedArray[1].destroyCard(true);
+      // Victory: cardToDismantle reaches 0.
+      this.cardsToDismantle = this.cardsToDismantle - 2;
+      if (this.cardsToDismantle === 0){
+        this.runAnimVictory();
+      }
+      this.revealedArray = [];
+    }
+  }
+
+  rememberReveal(whichCard){
+    // The player turns up a card. Animation is Card's job.
+    // If this is the third card that is being turned up: Forget the previous two:
+    this.checkRevealMaximum();
+    // Add this card to the array that remembers upturned cards. Check if they are the same.
+    this.revealedArray.push(whichCard);
+    if (this.revealedArray.length === 2){
+      this.checkIsEqual();
+    }
+  }
+
+  undoReveal(whichCard){
+  // The player manually turns down a card. The animation is Card's job.
+  // Grid splices the previously revealed card.
+    if (this.revealedArray[0] === whichCard){
+      this.revealedArray.splice(0, 1);
+    } else {
+      this.revealedArray.splice(1, 1);
+    }
+  }
+
   updateScorecard(){
+    // Tracking the level.
     this.htmlElementTrackLevel.textContent = "You are on Level " + this.trackLevelValue + ".";
+    // Tracking moves:
     if (this.trackMovesNumMoves === 1){
       this.htmlElementTrackMoves.textContent = "You have made 1 move this level.";
     } else {
       this.htmlElementTrackMoves.textContent = "You have made " + this.trackMovesNumMoves + " moves this level.";
     }
+    // Tracking time:
     if (this.trackTimeTimeElapsed === -1){
       this.htmlElementTrackTime.textContent = "You haven't started this level yet."
     } else if (this.trackTimeTimeElapsed === 1){
@@ -331,6 +340,15 @@ class Grid {
       var tempInteger = Math.floor(this.trackTimeTimeElapsed/60);
       this.htmlElementTrackTime.textContent = "You have spent " + tempInteger + " minutes and " + (this.timeElapsed - 60 * tempInteger) + " seconds on this level.";
     }
+  }
+
+  runAnimVictory(){
+    window.setTimeout(this.runAnimVictoryCallback.bind(this), 5000);
+  }
+
+  runAnimVictoryCallback(){
+    this.trackLevelValue = this.trackLevelValue + 1;
+    startNextLevel(2 + this.trackLevelValue, this.trackLevelValue);
   }
 
   trackMoves(){
