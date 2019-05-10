@@ -23,6 +23,10 @@
   margin-top: -50px;
 }
 
+.victoryText{
+  position: absolute;
+}
+
 .cardAnimShowHide{
   animation-name: cardAnimShowHide;
   animation-duration: 0.5s;

@@ -169,6 +169,7 @@ class Grid {
     this.cardArray = this.createCardArray();
     this.cardsToDismantle = this.cardArray.length;
     this.revealedArray = [];
+    this.victoryAnimArray = [];
     // Trackers:
     this.trackMovesNumMoves = 0;
     this.trackTimeTimeElapsed = -1;
@@ -293,7 +294,7 @@ class Grid {
       // Victory: cardToDismantle reaches 0.
       this.cardsToDismantle = this.cardsToDismantle - 2;
       if (this.cardsToDismantle === 0){
-        this.runAnimVictory();
+        this.victory();
       }
       this.revealedArray = [];
     }
@@ -342,11 +343,29 @@ class Grid {
     }
   }
 
+  victory(){
+    this.runAnimVictory();
+  }
+
   runAnimVictory(){
+    var tempArray = ["V", "I", "C", "T", "O", "R", "Y", "!"];
+    for (var index = 0; index < tempArray.length; index++){
+      var tempElement = document.createElement("div");
+      htmlGrid.appendChild(tempElement);
+      tempElement.style.left = 100 + 50*index + "px";
+      tempElement.style.top = 300;
+      tempElement.className = "victoryText"
+      tempElement.textContent = tempArray[index];
+      this.victoryAnimArray.push(tempElement);
+    }
     window.setTimeout(this.runAnimVictoryCallback.bind(this), 5000);
   }
 
+
   runAnimVictoryCallback(){
+    for (var index = 0; index < this.victoryAnimArray.length; index++){
+      htmlGrid.removeChild(this.victoryAnimArray[index]);
+    }
     this.trackLevelValue = this.trackLevelValue + 1;
     startNextLevel(2 + this.trackLevelValue, this.trackLevelValue);
   }
