@@ -344,11 +344,20 @@ class Grid {
   }
 
   victory(){
+    window.clearTimeout(this.trackTimeTimer);
     this.runAnimVictory();
   }
 
   runAnimVictory(){
-    var tempArray = ["V", "I", "C", "T", "O", "R", "Y", "!"];
+    var tempInteger = Math.floor(Math.random()*3);
+    if (tempInteger === 1){
+      var tempArray = ["V", "I", "C", "T", "O", "R", "Y", "!"];
+    } else if (tempInteger === 2) {
+      var tempArray = ["W", "E", "L", "L", " ", "D", "O", "N", "E", "!"];
+    } else {
+      var tempArray = ["C", "O", "N", "G", "R", "A", "T", "U", "L", "A", "T", "I", "O", "N", "S", "!"];
+    }
+
     for (var index = 0; index < tempArray.length; index++){
       var tempElement = document.createElement("div");
       htmlGrid.appendChild(tempElement);
@@ -356,6 +365,7 @@ class Grid {
       tempElement.style.top = 300;
       tempElement.className = "victoryText"
       tempElement.textContent = tempArray[index];
+      tempElement.classList.add("victoryTextAnim");
       this.victoryAnimArray.push(tempElement);
     }
     window.setTimeout(this.runAnimVictoryCallback.bind(this), 5000);
@@ -377,7 +387,8 @@ class Grid {
 
   trackTime(){
     this.trackTimeTimeElapsed++;
-    window.setTimeout(this.trackTime.bind(this),1000);
+    this.trackTimeTimer = window.setTimeout(this.trackTime.bind(this),1000);
+    this.updateScorecard();
   }
 }
 
@@ -398,6 +409,7 @@ var htmlGrid = document.getElementById('htmlGrid');
 
 var grid = null;
 function startNextLevel(numCards, whichLevel){
+  grid = null;
   grid = new Grid(numCards, whichLevel);
 }
 
