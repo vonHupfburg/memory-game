@@ -338,7 +338,7 @@ class Grid {
       this.htmlElementTrackTime.textContent = "You have spent " + this.trackTimeTimeElapsed + " seconds on this level."
     } else if (this.trackTimeTimeElapsed > 60 ) {
       var tempInteger = Math.floor(this.trackTimeTimeElapsed/60);
-      this.htmlElementTrackTime.textContent = "You have spent " + tempInteger + " minutes and " + (this.timeElapsed - 60 * tempInteger) + " seconds on this level.";
+      this.htmlElementTrackTime.textContent = "You have spent " + tempInteger + " minutes and " + (this.trackTimeTimeElapsed - 60 * tempInteger) + " seconds on this level.";
     }
   }
 
