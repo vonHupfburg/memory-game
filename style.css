@@ -6,8 +6,11 @@
   margin: 1px;
   border:1px solid RGB(30,30,30);
   border-radius: 5px 15px;
-  background: RGB(180,180,180);
   text-align: center;
+  background-image: url(images/cardback.jpg);
+  background-position: center;
+  background-size: 100px;
+  background-color: rgb(180, 180, 180);
 }
 
 .card img {
@@ -34,84 +37,84 @@ p {
 }
 
 
-.victoryText{
+.victory-text {
   position: absolute;
   font-family: garamond;
   font-size: 200%;
 }
 
-.victoryTextAnim{
-  animation-name: victoryTextAnim;
+.victory-text-anim {
+  animation-name: victory-text-anim;
   animation-duration: 5s;
 }
 
-.cardAnimShowHide{
-  animation-name: cardAnimShowHide;
+.card-anim-show-hide {
+  animation-name: card-anim-show-hide;
   animation-duration: 0.5s;
 }
 
-.cardAnimDestroy{
-  animation-name: cardAnimDestroy;
+.card-anim-destroy {
+  animation-name: card-anim-destroy;
   animation-duration: 0.5s;
 }
 
-.cardImgAnimShow{
-  animation-name: cardImgAnimShow;
+.card-img-anim-show {
+  animation-name: card-img-anim-show;
   animation-duration: 0.5s;
 }
 
-.cardImgAnimHide{
-  animation-name: cardImgAnimHide;
+.card-img-anim-hide {
+  animation-name: card-img-anim-hide;
   animation-duration: 0.5s;
 }
 
-.cardImgAnimDestroy{
-  animation-name: cardImgAnimDestroy;
+.card-img-anim-destroy {
+  animation-name: card-img-anim-destroy;
   animation-duration: 0.5s;
 }
 
-.cardAnimAppear{
-  animation-name: cardAnimAppear;
+.card-anim-appear {
+  animation-name: card-anim-appear;
   animation-duration: 0.5s;
 }
 
-@-webkit-keyframes cardAnimShowHide {
+@-webkit-keyframes card-anim-show-hide {
   0% {width: 100px; margin-left: 0px;}
   40% {width: 0px; margin-left: 50px;}
   60% {width: 0px; margin-left: 50px;}
   100% {width: 100px; margin-left: 0px;}
 }
 
-@-webkit-keyframes cardAnimAppear {
+@-webkit-keyframes card-anim-appear {
   0% {width: 0px; margin-left: 50px; height: 0px; margin-top: 50px;}
   100% {width: 100px; margin-left: 0px; height: 100px; margin-top: 0px;}
 }
 
-@-webkit-keyframes cardAnimDestroy {
+@-webkit-keyframes card-anim-destroy {
   0% {width: 100px; margin-left: 0px; height: 100px; margin-top: 0px;}
   100% {width: 0px; margin-left: 50px; height: 0px; margin-top: 50px;}
 }
 
-@-webkit-keyframes cardImgAnimShow {
+@-webkit-keyframes card-img-anim-show {
   0% {visibility: hidden; width: 100px; margin-left: -50px;}
   40% {visibility: hidden; width: 0px; margin-left: 0px;}
   60% {visibility: visible; width: 0px; margin-left: 0px;}
   100% {visibility: visible; width: 100px; margin-left: -50px;}
 }
 
-@-webkit-keyframes cardImgAnimHide {
+@-webkit-keyframes card-img-anim-hide {
   0% {visibility: visible; width: 100px; margin-left: -50px;}
   40% {visibility: visible; width: 0px; margin-left: 0px;}
   60% {visibility: hidden; width: 0px; margin-left: 0px;}
   100% {visibility: hidden; width: 100px; margin-left: -50px;}
 }
 
-@-webkit-keyframes cardImgAnimDestroy {
+@-webkit-keyframes card-img-anim-destroy {
   0% {width: 100px; margin-left: -50px; height: 100px; margin-top: -50px;}
   100% {width: 0px; margin-left: 0px; height: 0px; margin-top: 0px;}
 }
 
-@-webkit-keyframes victoryTextAnim {
+@-webkit-keyframes victory-text-anim {
   0% {margin-top:  500px; text-shadow: 200px 100px #909090; opacity: 1;}
   100 {margin-top: 0px; text-shadow: 0px 0px #909090; opacity: 0;}
 }
