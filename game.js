@@ -40,10 +40,10 @@ class Card{
 
   htmlElementOnClick(){
     memoryGame.trackMoves();
-    if (this.isRevealed === false && this.animationIsBusy === false){
+    if (!this.isRevealed && !this.animationIsBusy){
       this.showImage();
       memoryGame.grid.addToRevealedArray(this);
-    } else if (this.isRevealed === true && this.animationIsBusy === false) {
+    } else if (this.isRevealed && !this.animationIsBusy) {
       memoryGame.grid.nullRevealedArray();
     }
     if (memoryGame.trackTimeTimeElapsed === -1){
@@ -67,7 +67,7 @@ class Card{
   }
 
   runAnimations(){
-    if (this.animationIsBusy === false && this.animationQueue.length !== 0){
+    if (!this.animationIsBusy && this.animationQueue.length !== 0){
       this.runNextAnimation();
     }
   }
@@ -353,7 +353,7 @@ class MemoryGame {
   }
 
   createSrcArray(){
-    var tempArray = [
+    return [
       "images/im1.jpg",
       "images/im2.jpg",
       "images/im3.jpg",
@@ -373,11 +373,10 @@ class MemoryGame {
       "images/im17.jpg",
       "images/im18.jpg",
     ];
-    return tempArray;
   }
 
   createCardTypeArray(){
-    var tempArray = []
+    var tempArray = [];
     for (var index = 0; index < this.srcArray.length; index++){
       tempArray.push(new CardType(this.srcArray[index], index));
     }
