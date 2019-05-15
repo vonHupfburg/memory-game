@@ -1,2 +1,2 @@
 # memory-game
-A memory game to be part of my portfolio
+A memory game to be part of my portfolio.
